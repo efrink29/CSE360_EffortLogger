@@ -15,9 +15,13 @@ import java.util.Map.Entry;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextInputDialog;
 
+// -- Added Imports (Honors Contract) --
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
+// ----
+
+
 import java.util.Base64;
 
 
@@ -26,12 +30,16 @@ public class UserManager {
     private HashMap<String, Integer> userIDs; // Maps usernames to their respective IDs
     private ArrayList<User> validUsers; // List of valid users
     private String userFileName; // path to file where user data is stored
+
+	// -- Initialize AES (Honors Contract) --
     private static final String AES = "AES";
     private static final byte[] keyValue = 
         new byte[] { 'Y', 'o', 'u', 'r', 'S', 'e', 'c', 'r', 'e', 't', 'K', 'e', 'y', 'H', 'e', 'r' };
+	// ----
 
-    
+	// -- Added Throws (Honors Contract) --
     public UserManager(String userFileName) throws Exception {
+	// ----
         userIDs = new HashMap<>();
         validUsers = new ArrayList<>();
         this.userFileName = userFileName;
@@ -48,7 +56,10 @@ public class UserManager {
                 if (userDetails.length == 3) {
                 	String username = userDetails[0];
                     String encryptedPassword = userDetails[1];
+
+			// -- Changed to AES Decryption (Honors Contract) --
                     String password = AESdecrypt(encryptedPassword); // Decrypt the password
+			// --
                 	//String password = userDetails[1];
                     char type = userDetails[2].charAt(0);
 
@@ -63,8 +74,10 @@ public class UserManager {
         	showAlert("File Error", "An error occurred while writing to the file: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
-    
+
+	// -- Added Throws (Honors Contract) --
     public void saveUsersToFile() throws Exception {
+	// ----
         try {
             FileWriter fileWriter = new FileWriter(userFileName);
             PrintWriter printWriter = new PrintWriter(fileWriter);
@@ -72,8 +85,9 @@ public class UserManager {
             for (User u : validUsers) {
                 String username = u.getUsername();
                 
-                // Modified to generate encrypted password
+                // -- Modified to generate encrypted password (Honors Contract) --
                 String encryptedPassword = AESencrypt(u.getPassword()); // Encrypt the password
+		// --
                 String line = String.format("%s,%s,%c", username, encryptedPassword, u.getType());
                 System.out.println(line);
                 printWriter.println(line);
@@ -160,7 +174,8 @@ public class UserManager {
         alert.setContentText(content);
         alert.showAndWait();
     }
-    
+
+// -- Added New AES Methods (Honors Contract) --
     private static String AESencrypt(String Data) throws Exception  {
         Key key = generateKey();
         Cipher c = Cipher.getInstance(AES);
@@ -177,6 +192,7 @@ public class UserManager {
         byte[] decValue = c.doFinal(decodedValue);
         return new String(decValue);
     }
+// ----
 
     private static Key generateKey() throws Exception {
         return new SecretKeySpec(keyValue, AES);
